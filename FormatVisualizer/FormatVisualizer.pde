@@ -11,6 +11,10 @@ float hierarchyBoxWidth = -300;
 //Variables used for creating and drawing a Vector.
 float mouseXStart, mouseYStart, mouseXEnd, mouseYEnd;
 
+boolean isMouseClicked = false, isMouseClickedPreviously = false;
+
+int count;
+
 void setup()
 {
   size(1500, 1000);
@@ -22,24 +26,25 @@ void draw()
   
   
   //World Space
+  Matrix A = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
+  
+  if (isMouseClicked && !isMouseClickedPreviously)
+  {
+    count++;
+    if (count >= 2)
+    {
+      A.addVector(new Vector(mouseXStart, mouseYStart, mouseXEnd, mouseYEnd));
+      count = 0;
+    }
+  }
+ 
+  isMouseClickedPreviously = isMouseClicked;
+  
+  A.display();  
   
   pushMatrix();
   translate(midPointX, midPointY);
-  Matrix A = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
-  
-  if (mousePressed)
-  {
-    mouseXStart = mouseX;
-    mouseYStart = mouseY;
-  }
-  if (mouseXEnd != 0)
-  {
-    Vector newVector = new Vector(mouseXStart, mouseYStart, mouseXEnd, mouseYEnd);
-    A.addVector(newVector);
-    mouseXEnd = 0;
-  }
-  
-  A.display();
+ 
   popMatrix();
   
   //Screen Space
@@ -56,7 +61,12 @@ void draw()
   rect(origin.x, origin.y, hierarchyBoxWidth, midPointY);
   fill(0);
   stroke(0);
-  text("Hierarchy component # 1", hierarchyBoxWidth + 10, origin.y + 20);
+  for(Vector v : A.Vectors)
+  {
+    int i = 1;
+    text("Hierarchy component " + i, hierarchyBoxWidth + 10, origin.y + 20 * i);
+    i++;
+  }
   
   translate(0, 1000);
   fill(255);
@@ -64,22 +74,35 @@ void draw()
   fill(0);
   stroke(0);
   text("Property # 1", propertyBoxWidth + 10, -midPointY + 20);
-  translate(-1500, -1000);
   popMatrix();
   
   text("Canvas Area", sizeX / half - 70, sizeY / half + 5);
 }
 
+void mousePressed()
+{
+  if (mouseButton == LEFT)
+  {
+    isMouseClicked = true;
+    mouseXStart = mouseX;
+    mouseYStart = mouseY;
+  }
+}
+
 void mouseReleased()
 {
-  mouseXEnd = mouseX;
-  mouseYEnd = mouseY;
+  if (mouseButton == LEFT)
+  {
+    isMouseClicked = false;
+    mouseXEnd = mouseX;
+    mouseYEnd = mouseY;
+  }
 }
 
 class Matrix
 {
   float a, b, c, d, e, f, g, h, i;
-  ArrayList<Vector> Vectors = new ArrayList<Vector>();
+  public ArrayList<Vector> Vectors = new ArrayList<Vector>();
   
   Matrix(
     float inputValueA,
