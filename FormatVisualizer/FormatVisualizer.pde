@@ -1,3 +1,6 @@
+
+Matrix A = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
+
 PVector origin = new PVector(0, 0);
 float half = 2;
 float sizeY = 1000;
@@ -15,10 +18,25 @@ boolean isMouseClicked = false, isMouseClickedPreviously = false;
 
 int count;
 
+Vector previousVector;
+
 void setup()
 {
+  
+  
   size(1500, 1000);
   background(100);
+  
+  pushMatrix();
+  fill(255);
+  rect(origin.x, origin.y, toolBoxWidth, 1000);
+  
+  translate(1500, 0);
+  rect(origin.x, origin.y, hierarchyBoxWidth, midPointY);
+  
+  translate(0, 1000);
+  rect(origin.x, origin.y, propertyBoxWidth, -midPointY);
+  popMatrix();
 }
 
 void draw()
@@ -26,14 +44,13 @@ void draw()
   
   
   //World Space
-  Matrix A = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
-  
   if (isMouseClicked && !isMouseClickedPreviously)
   {
     count++;
     if (count >= 2)
     {
       A.addVector(new Vector(mouseXStart, mouseYStart, mouseXEnd, mouseYEnd));
+      previousVector = A.Vectors.get(A.Vectors.size() - 1);
       count = 0;
     }
   }
@@ -50,29 +67,20 @@ void draw()
   //Screen Space
   
   pushMatrix();
-  fill(255);
-  rect(origin.x, origin.y, toolBoxWidth, 1000);
   fill(0);
   stroke(0);
   text("Tool # 1", toolBoxWidth / half - 20, origin.y + 20);
   
   translate(1500, 0);
-  fill(255);
-  rect(origin.x, origin.y, hierarchyBoxWidth, midPointY);
-  fill(0);
-  stroke(0);
   for(Vector v : A.Vectors)
   {
     int i = 1;
     text("Hierarchy component " + i, hierarchyBoxWidth + 10, origin.y + 20 * i);
     i++;
   }
+  println(A.Vectors);
   
   translate(0, 1000);
-  fill(255);
-  rect(origin.x, origin.y, propertyBoxWidth, -midPointY);
-  fill(0);
-  stroke(0);
   text("Property # 1", propertyBoxWidth + 10, -midPointY + 20);
   popMatrix();
   
@@ -97,6 +105,11 @@ void mouseReleased()
     mouseXEnd = mouseX;
     mouseYEnd = mouseY;
   }
+}
+
+void updateText()
+{
+  
 }
 
 class Matrix
