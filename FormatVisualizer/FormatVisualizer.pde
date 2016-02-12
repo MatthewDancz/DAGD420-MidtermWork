@@ -2,6 +2,7 @@
 Matrix A = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
 
 PVector origin = new PVector(0, 0);
+
 float half = 2;
 float sizeY = 1000;
 float sizeX = 1500;
@@ -10,6 +11,8 @@ float midPointX = sizeX / half;
 float toolBoxWidth = 200;
 float propertyBoxWidth = -300;
 float hierarchyBoxWidth = -300;
+
+boolean isTextChanged = false;
 
 //Variables used for creating and drawing a Vector.
 float mouseXStart, mouseYStart, mouseXEnd, mouseYEnd;
@@ -22,21 +25,11 @@ Vector previousVector;
 
 void setup()
 {
-  
-  
   size(1500, 1000);
   background(100);
-  
-  pushMatrix();
-  fill(255);
-  rect(origin.x, origin.y, toolBoxWidth, 1000);
-  
-  translate(1500, 0);
-  rect(origin.x, origin.y, hierarchyBoxWidth, midPointY);
-  
-  translate(0, 1000);
-  rect(origin.x, origin.y, propertyBoxWidth, -midPointY);
-  popMatrix();
+  line(width/half - 50, -402, width/half - 50, 1402);
+  line(-402, midPointY, 1402, midPointY);
+  updateWindow();
 }
 
 void draw()
@@ -52,6 +45,7 @@ void draw()
       A.addVector(new Vector(mouseXStart, mouseYStart, mouseXEnd, mouseYEnd));
       previousVector = A.Vectors.get(A.Vectors.size() - 1);
       count = 0;
+      isTextChanged = true;
     }
   }
  
@@ -65,26 +59,43 @@ void draw()
   popMatrix();
   
   //Screen Space
-  
+  if(isTextChanged)
+  {
+    updateWindow();
+  }
+
+}
+
+void updateWindow()
+{
   pushMatrix();
+  fill(255);
+  strokeWeight(2);
+  rect(origin.x, origin.y, toolBoxWidth, 1000);
   fill(0);
   stroke(0);
   text("Tool # 1", toolBoxWidth / half - 20, origin.y + 20);
   
   translate(1500, 0);
+  fill(255);
+  rect(origin.x, origin.y, hierarchyBoxWidth, midPointY);
+  fill(0);
+  stroke(0);
+  int i = 1;
   for(Vector v : A.Vectors)
   {
-    int i = 1;
     text("Hierarchy component " + i, hierarchyBoxWidth + 10, origin.y + 20 * i);
     i++;
   }
   println(A.Vectors);
   
   translate(0, 1000);
+  fill(255);
+  rect(origin.x, origin.y, propertyBoxWidth, -midPointY);
+  fill(0);
+  stroke(0);
   text("Property # 1", propertyBoxWidth + 10, -midPointY + 20);
   popMatrix();
-  
-  text("Canvas Area", sizeX / half - 70, sizeY / half + 5);
 }
 
 void mousePressed()
@@ -107,66 +118,66 @@ void mouseReleased()
   }
 }
 
-void updateText()
-{
-  
-}
-
 class Matrix
 {
   float a, b, c, d, e, f, g, h, i;
   public ArrayList<Vector> Vectors = new ArrayList<Vector>();
   
   Matrix(
-    float inputValueA,
-    float inputValueB,
-    float inputValueC,
-    float inputValueD,
-    float inputValueE,
-    float inputValueF,
-    float inputValueG,
-    float inputValueH,
-    float inputValueI)
+    float inputValueA, float inputValueB, float inputValueC,
+    float inputValueD, float inputValueE, float inputValueF,
+    float inputValueG, float inputValueH, float inputValueI)
   {
-    a = inputValueA;
-    b = inputValueB;
-    c = inputValueC;
-    d = inputValueD;
-    e = inputValueE;
-    f = inputValueF;
-    g = inputValueG;
-    h = inputValueH;
-    i = inputValueI;
+    a = inputValueA; b = inputValueB; c = inputValueC;
+    d = inputValueD; e = inputValueE; f = inputValueF;
+    g = inputValueG; h = inputValueH; i = inputValueI;
   }
   
-  void addVector(Vector worldVector)
-  {
-    Vectors.add(worldVector);
-  }
+  void addVector(Vector worldVector) { Vectors.add(worldVector); }
   
-  void translate()
+  void translate(float x, float y, Vector v)
   {
+    c = x;
+    f = y;
     
     display();
   }
   
-  void scale()
+  void scale(float x, float y, Vector v)
   {
+    a = x;
+    e = y;
     
     display();
   }
   
-  void rotate()
+  void rotate(float angle, Vector v)
   {
+    a = cos(angle);
+    b = sin(angle);
+    d = -b;
+    e = a;
     
     display();
+  }
+  
+  void becomeIdentityMatrix()
+  {
+    a = 1; b = 0; c = 0;
+    d = 0; e = 1; f = 0;
+    g = 0; h = 0; i = 1;
   }
   
   void display()
   {
     for(Vector v : Vectors)
     {
-      line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
+      if (!v.getDrawnState())
+      {
+        strokeWeight(3);
+        line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
+        v.setIsDrawn();
+      }
     }
   }
 }
@@ -174,6 +185,7 @@ class Matrix
 class Vector
 {
   private float originX, originY, componentX, componentY, magnitude, thetaAngle;
+  private boolean isDrawn = false;
   
   Vector (float originx, float originy, float x, float y)
   {
@@ -185,10 +197,12 @@ class Vector
     thetaAngle = atan2(componentY, componentX);
   }
   
+  boolean getDrawnState() { return isDrawn; }
   float getOriginX() { return originX; }
   float getOriginY() { return originY; }
   float getComponentX() { return componentX; }
   float getComponentY() { return componentY; }
   float getMagnitude() { return magnitude; }
   float getThetaAngle() { return thetaAngle; }
+  void setIsDrawn() { isDrawn = !isDrawn; }
 }
