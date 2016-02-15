@@ -1,13 +1,20 @@
 
-State state;
+StateManager stateManager;
+int mouseWheelValue;
 
 void setup(){
   size(900,900);
   background(100);
-  state = new TriangleState();
+  stateManager = new StateManager();
 }
 void draw(){
-  state.Update();
-  state.Draw();
+  stateManager.Draw();
+  
+  
+  mouseWheelValue = 0;
   
 }
+
+  void mouseWheel(MouseEvent event) {
+    mouseWheelValue = event.getCount();
+  } 
