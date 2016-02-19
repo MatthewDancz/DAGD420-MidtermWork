@@ -3,7 +3,7 @@ class StateManager{
  
  
  StateManager(){
-   state = new TriangleState();
+   state = new CircleState();
  }
  void Draw(){
   state.Update();
