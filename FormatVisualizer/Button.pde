@@ -17,13 +17,14 @@ class Button
   Vector heldVector;
   int heldIndex, myIndex;
   
-  Button(PVector pos, float w, float h) 
+  Button(PVector pos, float w, float h, int index) 
   { 
     position = pos;
     addPoint(w/2, h/2);
     addPoint(w/2, -h/2);
     addPoint(-w/2, -h/2);
     addPoint(-w/2, h/2);
+    myIndex = index;
   }
   
   void addPoint(float x, float y)
