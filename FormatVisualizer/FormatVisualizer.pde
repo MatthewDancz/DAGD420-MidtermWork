@@ -24,6 +24,7 @@ boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = f
 boolean isHelpTextDrawn = false, isUpdateHelpText = true;
 
 ArrayList<Button> Buttons = new ArrayList<Button>();
+ArrayList<Button> deleteButtons = new ArrayList<Button>();
 ArrayList<Button> toolBoxButtons = new ArrayList<Button>();
 Button addVector, subtractVector, drawVector;
 
@@ -148,6 +149,10 @@ void updateWindow()
     b.setText("Vector " + i);
     b.update(isMouseClicked, v, 1500);
     Buttons.add(b);
+    Button d = new Button(new PVector(hierarchyBoxWidth - 320, origin.y + 20 * i - 10), 20, 20);
+    d.setText("X");
+    d.update(isMouseClicked, A.Vectors.size(), 1500);
+    deleteButtons.add(d);
     i++;
   }
   
@@ -218,6 +223,24 @@ void mousePressed()
         secondVector = b.whenClicked();
         isVectorAdded = false;
       }
+    }
+  }
+  
+  for (int i = 0; i < deleteButtons.size(); i++)
+  {
+    println(deleteButtons.get(i).getMyIndex());
+    if (deleteButtons.get(i).getRemoveMe())
+    {
+      deleteButtons.remove(deleteButtons.get(i).getMyIndex());
+    }
+  }
+  
+  for (Button b : deleteButtons)
+  {
+    if (mouseButton == LEFT && b.isColliding())
+    {
+      A.removeVector(b.getHeldIndex());
+      b.removeMe = true;
     }
   }
   
@@ -296,6 +319,7 @@ class Matrix
   }
   
   void addVector(Vector worldVector) { Vectors.add(worldVector); }
+  void removeVector(int index) { Vectors.remove(index); }
   
   void myTranslate(float x, float y, Vector v)
   {

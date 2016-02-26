@@ -10,11 +10,12 @@ class Button
   float bbEdgeL = 0, bbEdgeR = 0, bbEdgeT = 0, bbEdgeB = 0;
   float scale = 1;
   
-  boolean colliding = false, doneChecking = false;
+  boolean colliding = false, doneChecking = false, removeMe = false;
   
   String buttonText = null;
   
   Vector heldVector;
+  int heldIndex, myIndex;
   
   Button(PVector pos, float w, float h) 
   { 
@@ -65,6 +66,40 @@ class Button
     draw();
   }
   
+  void update(boolean isMousePressed, int y, float x)
+  {
+    doneChecking = false;
+    colliding = false;
+    heldIndex = y;
+    
+    matrix.reset();
+    matrix.translate(position.x, position.y);
+    matrix.scale(scale);
+    
+    bbEdgeL = Float.MAX_VALUE;
+    bbEdgeT = Float.MAX_VALUE;
+    bbEdgeR = Float.MIN_VALUE;
+    bbEdgeB = Float.MIN_VALUE;
+    
+    for (int i = 0; i < mPoints.size(); i++)
+    {
+      matrix.mult(mPoints.get(i), tPoints.get(i));
+      PVector p = tPoints.get(i);
+      if (p.x > bbEdgeR) bbEdgeR = p.x;
+      if (p.x < bbEdgeL) bbEdgeL = p.x;
+      if (p.y > bbEdgeB) bbEdgeB = p.y;
+      if (p.y < bbEdgeT) bbEdgeT = p.y;
+    }
+    
+    colliding = checkCollisionWithPoint(new PVector(mouseX - x, mouseY));
+    
+    if (isMousePressed && colliding)
+    {
+      
+    }
+    
+    draw();
+  }
   
   void update(boolean isMousePressed, Vector v, float x)
   {
@@ -110,15 +145,12 @@ class Button
     }
   }
   
-  public Vector whenClicked()
-  {
-    return heldVector;
-  }
-  
-  public boolean isColliding()
-  {
-    return colliding;
-  }
+  public Vector whenClicked() { return heldVector; }
+  public int getHeldIndex() { return heldIndex; }
+  public int getMyIndex() { return myIndex; }
+  public boolean getRemoveMe() { return removeMe; }
+  public boolean isColliding() { return colliding; }
+  public void setMyIndex(int i) { myIndex = i; }
   
   void draw()
   {
@@ -146,15 +178,8 @@ class Button
     return true;
   } 
   
-  void setText(String text)
-  {
-    buttonText = text;
-  }
-  
-  void setPosition(PVector v)
-  {
-    position = v;
-  }
+  void setText(String text) { buttonText = text; }
+  void setPosition(PVector v) { position = v; }
 }
 
 class MinMax
