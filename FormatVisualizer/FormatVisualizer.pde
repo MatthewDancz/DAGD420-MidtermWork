@@ -21,6 +21,7 @@ float xStart = 0, yStart = 0, mouseXEnd, mouseYEnd;
 
 boolean isMouseClicked = false, isMouseClickedPreviously = false, onButton = false, isVectorAdded = true;
 boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = false, isDrawVector = true;
+boolean isHelpTextDrawn = false, isUpdateHelpText = true;
 
 ArrayList<Button> Buttons = new ArrayList<Button>();
 ArrayList<Button> toolBoxButtons = new ArrayList<Button>();
@@ -28,14 +29,16 @@ Button addVector, subtractVector, drawVector;
 
 Vector previousVector, firstVector, secondVector;
 
-int count = 0;
+int counts = 0;
+
+String direction = "Click to draw Vectors.";
 
 void setup()
 {
   size(1500, 1000);
   background(100);
-  line(midPointX, -402, midPointX, 1402);
-  line(-402, midPointY, 1402, midPointY);
+  line(midPointX, -10000, midPointX, 10000);
+  line(-10000, midPointY, 10000, midPointY);
   
   drawVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   drawVector.setText("Draw Vectors");
@@ -119,6 +122,17 @@ void updateWindow()
     b.update(isMouseClicked, 0);
     j++;
   }
+  if (isHelpTextDrawn == false || isUpdateHelpText == true)
+  {
+    fill(100);
+    noStroke();
+    rect(origin.x, origin.y + 23, toolBoxWidth + 20, 20);
+    fill(0);
+    stroke(0);
+    text(direction, origin.x + 3, origin.y + 40);
+    isHelpTextDrawn = true;
+    isUpdateHelpText = false;
+  }
   
   translate(1500, 0);
   fill(255);
@@ -163,6 +177,8 @@ void mousePressed()
       isDrawVector = true;
       isAddVector = false;
       isSubtractVector = false;
+      direction = "Click to draw Vectors.";
+      isUpdateHelpText = true;
     }
     
     if (addVector.isColliding() == true)
@@ -170,6 +186,8 @@ void mousePressed()
       isDrawVector = false;
       isAddVector = true;
       isSubtractVector = false;
+      direction = "Select vectors by left and right clicking.";
+      isUpdateHelpText = true;
     }
     
     if (subtractVector.isColliding() == true)
@@ -177,6 +195,8 @@ void mousePressed()
       isDrawVector = false;
       isAddVector = false;
       isSubtractVector = true;
+      direction = "Select vectors by left and right clicking.";
+      isUpdateHelpText = true;
     }
   }
   
@@ -330,7 +350,9 @@ class Matrix
         popMatrix();
         strokeWeight(3);
         line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
+        fill(0, 255, 0);
         text(v.getVectorName(), v.getMagnitude()/half * cos(v.getThetaAngle()), v.getMagnitude()/half * sin(v.getThetaAngle()));
+        fill(0);
         v.setIsDrawn();
       }
     }
