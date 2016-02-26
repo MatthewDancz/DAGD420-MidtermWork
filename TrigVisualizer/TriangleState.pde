@@ -19,36 +19,39 @@ class TriangleState extends State {
 
   float TmouseX;
   float TmouseY;
-  
+
   PVector selectedPoint;
   float scale = 4;
 
 
+  TriangleState() {
+    println("THI");
+    name = "tri";
+  }
 
- 
 
   void Update() {
-    
-  
+
+
     if (mouseWheelValue > 0) scale--;
     if (mouseWheelValue < 0) scale++;
     if (scale >=5) scale = 5;
     if (scale <= 1) scale = 1;
-  
-    
-    
+
+
+
     TmouseX = mouseX - width/2;
     TmouseY = mouseY - height/2;
-    
+
     selectedPoint = new PVector(TmouseX, TmouseY);
     selectedPoint.div(scale);
     selectedPoint = new PVector(floor(selectedPoint.x), floor(selectedPoint.y));
-    
+
     //get lenghts
     oppLength = dist(selectedPoint.x, 0, selectedPoint.x, selectedPoint.y);
     hypLength = dist(0, 0, selectedPoint.x, selectedPoint.y);
     adjLength = dist(selectedPoint.x, 0, 0, 0);
-    
+
     //update text pos
     UpdateTextPos();
 
@@ -66,9 +69,17 @@ class TriangleState extends State {
 
     background(70);
     stroke(0);
-    strokeWeight(1 / scale);
+    strokeWeight(2 / scale);
     line(0, -height/2, 0, height/2);
     line(-width/2, 0, width/2, 0);
+
+    strokeWeight(1 / scale);
+    for (int i = -width/2; i < width/2; i += 10) {
+      line(i, -height/2, i, height/2);
+    }
+    for (int i = -height/2; i < height/2; i += 10) {
+      line(-width/2, i, width/2, i);
+    }
 
     //draw triangle
     //grey sides
@@ -83,7 +94,7 @@ class TriangleState extends State {
     stroke(255, 255, 0);
     strokeWeight(5 / scale);
     line(0, 0, selectedPoint.x, selectedPoint.y);
-    
+
     textSize(16 / scale);
 
     text(oppLengthStr, oppTextPos.x, oppTextPos.y);
@@ -92,19 +103,24 @@ class TriangleState extends State {
 
     popMatrix();
 
+    textSize(16);
+    text("Hypotenuse Length     =  " + hypLengthStr, 10, 15);
+    text("Adjacent Side Length  =  " + adjLengthStr, 10, 30);
+    text("Opposite Side Length  =  " + oppLengthStr, 10, 45);
 
+    // text("Hypotenuse Angle      =  " + angleText, 10,75);
 
     super.Draw();
   }
   void UpdateTextPos() {
     if (selectedPoint.x < 0) {
-      oppTextPos.x = selectedPoint.x - (50 / scale);
-      hypTextPos.x = selectedPoint.x + (0 - selectedPoint.x)/2 + (10 / scale);
+      oppTextPos.x = -adjLength - (80 / scale);
+      hypTextPos.x = -adjLength/2 + 50/scale;
       adjTextPos.x = 0 + (selectedPoint.x - 0)/2;
       adjLength *= -1;
     } else {
       oppTextPos.x = selectedPoint.x + (10 / scale); 
-      hypTextPos.x = selectedPoint.x - (selectedPoint.x - 0)/2 - (50 / scale);
+      hypTextPos.x = adjLength/2 - 100/scale;
       adjTextPos.x = 0 - (0 - selectedPoint.x)/2;
     }
     if (TmouseY < 0) {
@@ -113,7 +129,7 @@ class TriangleState extends State {
       adjTextPos.y = 0 + (20 / scale);
     } else {
       oppTextPos.y = selectedPoint.y - oppLength/2;
-      hypTextPos.y = selectedPoint.y - (selectedPoint.y - 0)/2 + (10 * scale);
+      hypTextPos.y = oppLength/2;// / scale + (20 + 10 * scale);
       adjTextPos.y = 0 - (20 / scale);
       oppLength *= -1;
     }

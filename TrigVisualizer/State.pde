@@ -1,4 +1,5 @@
 class State{
+  public String name;
  State(){
    
    

@@ -15,7 +15,13 @@ PVector adjTextPos = new PVector();
 float hypLength;
 String hypLengthStr;
 PVector hypTextPos = new PVector();
-  
+
+String adjAngle;
+String oppAngle;
+  CircleState(){
+    println("THI");
+   name = "circle"; 
+  }
   
   void Update(){
     TmouseX = mouseX - width/2;
@@ -48,6 +54,8 @@ PVector hypTextPos = new PVector();
     adjLength = dist(pointOnEdge.x, 0, 0, 0);
     adjLength = map(adjLength, 0, 200, 0, 1);
     
+    angleText = nf(angle, 0, 3) + " radians";
+    
     //update text position based on quadrent
     UpdateTextPos();
   
@@ -77,7 +85,7 @@ PVector hypTextPos = new PVector();
     ellipse(0,0,400,400);
     
     //do radian text
-    text(nf(angle, 0, 3) + " radians", pointOnInsideEdge.x, pointOnInsideEdge.y);
+    text(angleText, pointOnInsideEdge.x, pointOnInsideEdge.y);
     
     //draw triangle
     //grey sides
@@ -103,7 +111,13 @@ PVector hypTextPos = new PVector();
   text(adjLengthStr, adjTextPos.x, adjTextPos.y);
     
     popMatrix();
-
+  text("Hypotenuse Length     =  " + hypLengthStr, 10,15);
+  text("Adjacent Side Length  =  " + adjLengthStr, 10,30);
+  text("Opposite Side Length  =  " + oppLengthStr, 10,45);
+  
+  text("Hypotenuse Angle      =  " + angleText, 10,75);
+  //text("Opposite Side Length = " + oppLengthStr, 10,10);
+  //text("Opposite Side Length = " + oppLengthStr, 10,10);
 
 
     super.Draw();
