@@ -277,7 +277,7 @@ class Matrix
   
   void addVector(Vector worldVector) { Vectors.add(worldVector); }
   
-  void translate(float x, float y, Vector v)
+  void myTranslate(float x, float y, Vector v)
   {
     propertyArray[0][2] = x;
     propertyArray[1][2] = y;
@@ -285,7 +285,7 @@ class Matrix
     display();
   }
   
-  void scale(float x, float y, Vector v)
+  void myScale(float x, float y, Vector v)
   {
     propertyArray[0][0] = x;
     propertyArray[1][1] = y;
@@ -293,7 +293,7 @@ class Matrix
     display();
   }
   
-  void rotate(float angle, Vector v)
+  void myRotate(float angle, Vector v)
   {
     propertyArray[0][0] = cos(angle);
     propertyArray[0][1] = sin(angle);
@@ -316,6 +316,18 @@ class Matrix
     {
       if (!v.getDrawnState())
       {
+        float m = 5;
+        PVector straight = new PVector(2 * m * cos(v.getThetaAngle()), 2 * m * sin(v.getThetaAngle()));
+        PVector normal1 = new PVector(-m * sin(v.getThetaAngle()), m * cos(v.getThetaAngle()));
+        PVector normal2 = new PVector(m * sin(v.getThetaAngle()), -m * cos(v.getThetaAngle()));
+        pushMatrix();
+        translate((v.getMagnitude() - 2 * m) * cos(v.getThetaAngle()), (v.getMagnitude() - 2 * m) * sin(v.getThetaAngle()));
+        beginShape();
+        vertex(straight.x, straight.y);
+        vertex(normal1.x, normal1.y);
+        vertex(normal2.x, normal2.y);
+        endShape(CLOSE);
+        popMatrix();
         strokeWeight(3);
         line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
         text(v.getVectorName(), v.getMagnitude()/half * cos(v.getThetaAngle()), v.getMagnitude()/half * sin(v.getThetaAngle()));
