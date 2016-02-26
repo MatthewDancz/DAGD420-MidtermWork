@@ -10,7 +10,7 @@ class Button
   float bbEdgeL = 0, bbEdgeR = 0, bbEdgeT = 0, bbEdgeB = 0;
   float scale = 1;
   
-  boolean colliding = false, doneChecking = false, isSelected = false;
+  boolean colliding = false, doneChecking = false;
   
   String buttonText = null;
   
@@ -154,16 +154,6 @@ class Button
   void setPosition(PVector v)
   {
     position = v;
-  }
-  
-  void setSelected(boolean t)
-  {
-    isSelected = t;
-  }
-  
-  boolean getSelected()
-  {
-    return isSelected;
   }
 }
 

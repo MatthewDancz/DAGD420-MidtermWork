@@ -11,18 +11,20 @@ float midPointX = sizeX / half;
 float toolBoxWidth = 200;
 float propertyBoxWidth = -300;
 float hierarchyBoxWidth = -300;
+float holder = 0;
+float[] lastLine = new float[4];
 
 boolean isTextChanged = false;
 
 //Variables used for creating and drawing a Vector.
 float xStart = 0, yStart = 0, mouseXEnd, mouseYEnd;
 
-boolean isMouseClicked = false, isMouseClickedPreviously = false, onButton = false;
-boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = false, isMultiplyVector = false, isDrawVector = true;
+boolean isMouseClicked = false, isMouseClickedPreviously = false, onButton = false, isVectorAdded = true;
+boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = false, isDrawVector = true;
 
 ArrayList<Button> Buttons = new ArrayList<Button>();
 ArrayList<Button> toolBoxButtons = new ArrayList<Button>();
-Button addVector, subtractVector, multiplyVector, drawVector;
+Button addVector, subtractVector, drawVector;
 
 Vector previousVector, firstVector, secondVector;
 
@@ -32,7 +34,7 @@ void setup()
 {
   size(1500, 1000);
   background(100);
-  line(width/half - 50, -402, width/half - 50, 1402);
+  line(midPointX, -402, midPointX, 1402);
   line(-402, midPointY, 1402, midPointY);
   
   drawVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
@@ -47,10 +49,6 @@ void setup()
   subtractVector.setText("Subtract Vectors");
   toolBoxButtons.add(subtractVector);
   
-  multiplyVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
-  multiplyVector.setText("Multiply Vectors");
-  toolBoxButtons.add(multiplyVector);
-  
   updateWindow();
 }
 
@@ -63,9 +61,36 @@ void draw()
   translate(midPointX, midPointY);
   if (isMouseClicked && !isMouseClickedPreviously)
   {
-    A.addVector(new Vector(xStart - 50, yStart, mouseXEnd, mouseYEnd));
+    holder = A.size() + 1;
+    A.addVector(new Vector("V" + holder, xStart, yStart, mouseXEnd, mouseYEnd));
     isTextChanged = true;
   }
+  if (isAddVector == true && isVectorAdded == false && firstVector != null && secondVector != null)
+  {
+    holder = A.size() + 1;
+    lastLine[0] = 0;
+    lastLine[1] = 0;
+    lastLine[2] = firstVector.getComponentX() + secondVector.getComponentX();
+    lastLine[3] = firstVector.getComponentY() + secondVector.getComponentY();
+    A.addVector(new Vector("V" + holder, xStart, yStart, firstVector.getComponentX() + secondVector.getComponentX(), firstVector.getComponentY() + secondVector.getComponentY()));
+    isVectorAdded = true;
+  }
+  if (isSubtractVector == true && isVectorAdded == false && firstVector != null && secondVector != null)
+  {
+    holder = A.size() + 1;
+    lastLine[0] = firstVector.getComponentX();
+    lastLine[1] = firstVector.getComponentY();
+    lastLine[2] = secondVector.getComponentX();
+    lastLine[3] = secondVector.getComponentY();
+    A.addVector(new Vector("V" + holder, xStart, yStart, firstVector.getComponentX() - secondVector.getComponentX(), firstVector.getComponentY() - secondVector.getComponentY()));
+    isVectorAdded = true;
+  }
+  
+  strokeWeight(0);
+  stroke(0, 255, 0);
+  line(lastLine[0], lastLine[1], lastLine[2], lastLine[3]);
+  strokeWeight(3);
+  stroke(0);
   
   A.display();
   isMouseClickedPreviously = isMouseClicked;
@@ -114,15 +139,16 @@ void updateWindow()
   
   translate(0, 1000);
   fill(255);
-  rect(origin.x, origin.y, propertyBoxWidth, -130);
+  rect(origin.x, origin.y, propertyBoxWidth, -150);
   fill(0);
   stroke(0);
   if (previousVector != null)
   {
-    text("X Component: " + previousVector.getComponentX(), propertyBoxWidth + 10, -130 + 20);
-    text("Y Component: " + previousVector.getComponentY(), propertyBoxWidth + 150, -130 + 20);
-    text("Magnitude: " + previousVector.getMagnitude(), propertyBoxWidth + 10, -130 + 40);
-    text("Theta: " + previousVector.getThetaAngle(), propertyBoxWidth + 150, -130 + 40);
+    text("Vector " + previousVector.getVectorName(), propertyBoxWidth + 10, -130);
+    text("X Component: " + previousVector.getComponentX(), propertyBoxWidth + 10, -110);
+    text("Y Component: " + previousVector.getComponentY(), propertyBoxWidth + 150, -110);
+    text("Magnitude: " + previousVector.getMagnitude(), propertyBoxWidth + 10, -90);
+    text("Theta: " + previousVector.getThetaAngle(), propertyBoxWidth + 150, -90);
   }
   drawMatrixNumbers(A);
   popMatrix();
@@ -137,7 +163,6 @@ void mousePressed()
       isDrawVector = true;
       isAddVector = false;
       isSubtractVector = false;
-      isMultiplyVector = false;
     }
     
     if (addVector.isColliding() == true)
@@ -145,7 +170,6 @@ void mousePressed()
       isDrawVector = false;
       isAddVector = true;
       isSubtractVector = false;
-      isMultiplyVector = false;
     }
     
     if (subtractVector.isColliding() == true)
@@ -153,15 +177,6 @@ void mousePressed()
       isDrawVector = false;
       isAddVector = false;
       isSubtractVector = true;
-      isMultiplyVector = false;
-    }
-    
-    if (multiplyVector.isColliding() == true)
-    {
-      isDrawVector = false;
-      isAddVector = false;
-      isSubtractVector = false;
-      isMultiplyVector = true;
     }
   }
   
@@ -169,11 +184,21 @@ void mousePressed()
   {
     if (mouseButton == LEFT && b.isColliding())
     {
-      b.setSelected(true);
       previousVector = b.whenClicked();
       onButton = true;
+      if (isAddVector == true || isSubtractVector == true)
+      {
+        firstVector = b.whenClicked();
+      }
     }
-
+    if (mouseButton == RIGHT && b.isColliding())
+    {
+      if (isAddVector == true || isSubtractVector == true)
+      {
+        secondVector = b.whenClicked();
+        isVectorAdded = false;
+      }
+    }
   }
   
   for (Button b : toolBoxButtons)
@@ -218,8 +243,7 @@ void drawMatrixNumbers(Matrix matrix)
   {
     for (int j = 0; j < 3; j++)
     {
-
-      text(matrix.propertyArray[i][j], propertyBoxWidth + 10 + j * 50, -110 + 20 * i + 60);
+      text(matrix.propertyArray[i][j], propertyBoxWidth + 10 + j * 50, -50 + 20 * i);
     }
   }
 }
@@ -294,30 +318,38 @@ class Matrix
       {
         strokeWeight(3);
         line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
+        text(v.getVectorName(), v.getMagnitude()/half * cos(v.getThetaAngle()), v.getMagnitude()/half * sin(v.getThetaAngle()));
         v.setIsDrawn();
       }
     }
+  }
+  
+  float size()
+  {
+    return Vectors.size();
   }
 }
 
 class Vector
 {
+  private String name;
   private float originX, originY, componentX, componentY, magnitude, thetaAngle;
   private boolean isDrawn = false;
   
-  Vector (float originx, float originy, float x, float y)
+  Vector (String vectorName, float originx, float originy, float x, float y)
   {
+    name = vectorName;
     originX = originx;
     originY = originy;
     componentX = x;
     componentY = y;
-    magnitude = sqrt(componentX * componentX + componentY * componentX);
+    magnitude = sqrt(componentX * componentX + componentY * componentY);
     thetaAngle = atan2(componentY, componentX);
   }
   
   Vector getUnitNormal()
   {
-    return new Vector(originX, originY, cos(thetaAngle), sin(thetaAngle));
+    return new Vector(name, originX, originY, cos(thetaAngle), sin(thetaAngle));
   }
   
   boolean getDrawnState() { return isDrawn; }
@@ -327,5 +359,6 @@ class Vector
   float getComponentY() { return componentY; }
   float getMagnitude() { return magnitude; }
   float getThetaAngle() { return thetaAngle; }
+  String getVectorName() { return name; }
   void setIsDrawn() { isDrawn = !isDrawn; }
 }
