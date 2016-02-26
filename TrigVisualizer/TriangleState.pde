@@ -22,6 +22,16 @@ class TriangleState extends State {
 
   PVector selectedPoint;
   float scale = 4;
+  
+  
+  color b1 = #1B94B5;
+  color g1 = #4D7782;
+  color b2 = #105669;
+  color b2o50 = color(16, 86, 105, 120);
+  color b2o25 = color(16, 86, 105, 60);
+  color b3 = #3A9AB5;
+  color b4 = #082C36;
+  color y1 = #FF9410;
 
 
   TriangleState() {
@@ -67,23 +77,27 @@ class TriangleState extends State {
     translate(width/2, height/2);
     scale(scale);
 
-    background(70);
-    stroke(0);
-    strokeWeight(2 / scale);
+    background(b4);
+    stroke(b2);
+    strokeWeight(3 / scale);
     line(0, -height/2, 0, height/2);
     line(-width/2, 0, width/2, 0);
 
     strokeWeight(1 / scale);
     for (int i = -width/2; i < width/2; i += 10) {
+      stroke(b2o25);
+      if(i % 50 == 0) stroke(b2o50);
       line(i, -height/2, i, height/2);
     }
     for (int i = -height/2; i < height/2; i += 10) {
+      stroke(b2o25);
+      if(i % 50 == 0) stroke(b2o50);
       line(-width/2, i, width/2, i);
     }
 
     //draw triangle
     //grey sides
-    stroke(150);
+    stroke(b3);
     strokeWeight(3 / scale);
     //opp
     line(selectedPoint.x, 0, selectedPoint.x, selectedPoint.y);
@@ -91,7 +105,7 @@ class TriangleState extends State {
     line(selectedPoint.x, 0, 0, 0);
 
     //yellow hypotenuse
-    stroke(255, 255, 0);
+    stroke(y1);
     strokeWeight(5 / scale);
     line(0, 0, selectedPoint.x, selectedPoint.y);
 
