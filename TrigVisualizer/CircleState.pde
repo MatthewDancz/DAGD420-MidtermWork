@@ -16,6 +16,15 @@ float hypLength;
 String hypLengthStr;
 PVector hypTextPos = new PVector();
 
+  color b1 = #1B94B5;
+  color g1 = #4D7782;
+  color b2 = #105669;
+  color b3 = #3A9AB5;
+  color b4 = #082C36;
+  color y1 = #FF9410;
+    color b2o50 = color(16, 86, 105, 120);
+  color b2o25 = color(16, 86, 105, 60);
+
 String adjAngle;
 String oppAngle;
   CircleState(){
@@ -71,25 +80,37 @@ String oppAngle;
     pushMatrix();
     translate(width/2, height/2);
     
-    background(70);
-    stroke(0);
-    strokeWeight(1);
+    background(b4);
+    stroke(b2);
+    strokeWeight(3);
     line(0, -height/2, 0, height/2);
     line(-width/2, 0, width/2, 0);
-
-    fill(240);
     
+    strokeWeight(1);
+    for (int i = -width/2; i < width/2; i += 10) {
+      stroke(b2o25);
+      if(i % 50 == 0) stroke(b2o50);
+      line(i, -height/2, i, height/2);
+    }
+    for (int i = -height/2; i < height/2; i += 10) {
+      stroke(b2o25);
+      if(i % 50 == 0) stroke(b2o50);
+      line(-width/2, i, width/2, i);
+    }
+
+stroke(b2);
+    fill(b3);
+    strokeWeight(3);
     
     //draw circle
     noFill();
     ellipse(0,0,400,400);
     
-    //do radian text
-    text(angleText, pointOnInsideEdge.x, pointOnInsideEdge.y);
+    
     
     //draw triangle
     //grey sides
-    stroke(150);
+    stroke(b1);
     strokeWeight(3);
     //opp
     line(pointOnEdge.x, 0, pointOnEdge.x, pointOnEdge.y);
@@ -101,11 +122,17 @@ String oppAngle;
     arc(0, 0, 60, 60, 0, angle);
     
     //yellow hypotenuse
-    stroke(255,255,0);
+    stroke(y1);
     strokeWeight(5);
     line(0, 0, pointOnEdge.x, pointOnEdge.y);
     
+    fill(255);
+    
+    
     //draw text
+    //do radian text
+    text(angleText, pointOnInsideEdge.x, pointOnInsideEdge.y);
+    
   text(oppLengthStr, oppTextPos.x, oppTextPos.y);
   text(hypLengthStr, hypTextPos.x, hypTextPos.y);
   text(adjLengthStr, adjTextPos.x, adjTextPos.y);
