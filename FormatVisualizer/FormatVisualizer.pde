@@ -17,10 +17,16 @@ boolean isTextChanged = false;
 //Variables used for creating and drawing a Vector.
 float xStart = 0, yStart = 0, mouseXEnd, mouseYEnd;
 
-boolean isMouseClicked = false, isMouseClickedPreviously = false;
+boolean isMouseClicked = false, isMouseClickedPreviously = false, onButton = false;
+boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = false, isMultiplyVector = false, isDrawVector = true;
 
-Vector previousVector;
-Matrix matrix;
+ArrayList<Button> Buttons = new ArrayList<Button>();
+ArrayList<Button> toolBoxButtons = new ArrayList<Button>();
+Button addVector, subtractVector, multiplyVector, drawVector;
+
+Vector previousVector, firstVector, secondVector;
+
+int count = 0;
 
 void setup()
 {
@@ -28,7 +34,23 @@ void setup()
   background(100);
   line(width/half - 50, -402, width/half - 50, 1402);
   line(-402, midPointY, 1402, midPointY);
-  matrix = new Matrix(1, 0, 0, 0, 1, 0, 0, 0, 1);
+  
+  drawVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
+  drawVector.setText("Draw Vectors");
+  toolBoxButtons.add(drawVector);
+  
+  addVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
+  addVector.setText("Add Vectors");
+  toolBoxButtons.add(addVector);
+  
+  subtractVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
+  subtractVector.setText("Subtract Vectors");
+  toolBoxButtons.add(subtractVector);
+  
+  multiplyVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
+  multiplyVector.setText("Multiply Vectors");
+  toolBoxButtons.add(multiplyVector);
+  
   updateWindow();
 }
 
@@ -42,7 +64,6 @@ void draw()
   if (isMouseClicked && !isMouseClickedPreviously)
   {
     A.addVector(new Vector(xStart - 50, yStart, mouseXEnd, mouseYEnd));
-    previousVector = A.Vectors.get(A.Vectors.size() - 1);
     isTextChanged = true;
   }
   
@@ -63,10 +84,16 @@ void updateWindow()
   pushMatrix();
   fill(255);
   strokeWeight(2);
-  rect(origin.x, origin.y, toolBoxWidth, 1000);
+  //rect(origin.x, origin.y, toolBoxWidth, 1000);
   fill(0);
   stroke(0);
-  text("Tool # 1", toolBoxWidth / half - 20, origin.y + 20);
+  int j = 0;
+  for (Button b : toolBoxButtons)
+  {
+    b.setPosition(new PVector(toolBoxWidth/2 + (j * toolBoxWidth), origin.y + 10));
+    b.update(isMouseClicked, 0);
+    j++;
+  }
   
   translate(1500, 0);
   fill(255);
@@ -80,23 +107,24 @@ void updateWindow()
   {
     Button b = new Button(new PVector(hierarchyBoxWidth/2, origin.y + 20 * i - 10), hierarchyBoxWidth, 20);
     b.setText("Vector " + i);
-    b.update(isMouseClicked, v);
+    b.update(isMouseClicked, v, 1500);
+    Buttons.add(b);
     i++;
   }
   
   translate(0, 1000);
   fill(255);
-  rect(origin.x, origin.y, propertyBoxWidth, -midPointY);
+  rect(origin.x, origin.y, propertyBoxWidth, -130);
   fill(0);
   stroke(0);
   if (previousVector != null)
   {
-    text("X Component: " + previousVector.getComponentX(), propertyBoxWidth + 10, -midPointY + 20);
-    text("Y Component: " + previousVector.getComponentY(), propertyBoxWidth + 150, -midPointY + 20);
-    text("Magnitude: " + nf(previousVector.getMagnitude()), propertyBoxWidth + 10, -midPointY + 40);
-    text("Theta: " + nf(previousVector.getThetaAngle()), propertyBoxWidth + 150, -midPointY + 40);
+    text("X Component: " + previousVector.getComponentX(), propertyBoxWidth + 10, -130 + 20);
+    text("Y Component: " + previousVector.getComponentY(), propertyBoxWidth + 150, -130 + 20);
+    text("Magnitude: " + previousVector.getMagnitude(), propertyBoxWidth + 10, -130 + 40);
+    text("Theta: " + previousVector.getThetaAngle(), propertyBoxWidth + 150, -130 + 40);
   }
-  drawMatrixNumbers(matrix);
+  drawMatrixNumbers(A);
   popMatrix();
 }
 
@@ -104,28 +132,95 @@ void mousePressed()
 {
   if (mouseButton == LEFT)
   {
+    if (drawVector.isColliding() == true)
+    {
+      isDrawVector = true;
+      isAddVector = false;
+      isSubtractVector = false;
+      isMultiplyVector = false;
+    }
+    
+    if (addVector.isColliding() == true)
+    {
+      isDrawVector = false;
+      isAddVector = true;
+      isSubtractVector = false;
+      isMultiplyVector = false;
+    }
+    
+    if (subtractVector.isColliding() == true)
+    {
+      isDrawVector = false;
+      isAddVector = false;
+      isSubtractVector = true;
+      isMultiplyVector = false;
+    }
+    
+    if (multiplyVector.isColliding() == true)
+    {
+      isDrawVector = false;
+      isAddVector = false;
+      isSubtractVector = false;
+      isMultiplyVector = true;
+    }
+  }
+  
+  for (Button b : Buttons)
+  {
+    if (mouseButton == LEFT && b.isColliding())
+    {
+      b.setSelected(true);
+      previousVector = b.whenClicked();
+      onButton = true;
+    }
+
+  }
+  
+  for (Button b : toolBoxButtons)
+  {
+    if (mouseButton == LEFT && b.isColliding())
+    {
+      onButton = true;
+    }
+  }
+  
+  if (mouseButton == LEFT && onButton == false && isDrawVector == true)
+  {
     isMouseClicked = true;
     mouseXEnd = mouseX - midPointX;
     mouseYEnd = mouseY - midPointY;
   }
 }
 
+void mouseReleased()
+{
+  for (Button b : Buttons)
+  {
+    b.colliding = false;
+  }
+  
+  for (Button b : toolBoxButtons)
+  {
+    b.colliding = false;
+  }
+  
+  if (mouseButton == LEFT)
+  {
+    isMouseClicked = false;
+    onButton = false;
+  }
+}
+
 void drawMatrixNumbers(Matrix matrix)
 {
+  text("World Matrix", propertyBoxWidth + 10, -110 + 40); 
   for (int i = 0; i < 3; i++)
   {
     for (int j = 0; j < 3; j++)
     {
-      text(matrix.propertyArray[i][j], propertyBoxWidth + 10 + j * 50, -midPointY + 20 * i + 60);
-    }
-  }
-}
 
-void mouseReleased()
-{
-  if (mouseButton == LEFT)
-  {
-    isMouseClicked = false;
+      text(matrix.propertyArray[i][j], propertyBoxWidth + 10 + j * 50, -110 + 20 * i + 60);
+    }
   }
 }
 
@@ -218,6 +313,11 @@ class Vector
     componentY = y;
     magnitude = sqrt(componentX * componentX + componentY * componentX);
     thetaAngle = atan2(componentY, componentX);
+  }
+  
+  Vector getUnitNormal()
+  {
+    return new Vector(originX, originY, cos(thetaAngle), sin(thetaAngle));
   }
   
   boolean getDrawnState() { return isDrawn; }

@@ -10,7 +10,7 @@ class Button
   float bbEdgeL = 0, bbEdgeR = 0, bbEdgeT = 0, bbEdgeB = 0;
   float scale = 1;
   
-  boolean colliding = false, doneChecking = false;
+  boolean colliding = false, doneChecking = false, isSelected = false;
   
   String buttonText = null;
   
@@ -31,7 +31,7 @@ class Button
     tPoints.add(new PVector());
   }
   
-  void update(boolean isMousePressed)
+  void update(boolean isMousePressed, float x)
   {
     doneChecking = false;
     colliding = false;
@@ -55,7 +55,7 @@ class Button
       if (p.y < bbEdgeT) bbEdgeT = p.y;
     }
     
-    colliding = checkCollisionWithPoint(new PVector(mouseX - 1500, mouseY));
+    colliding = checkCollisionWithPoint(new PVector(mouseX - x, mouseY));
     
     if (isMousePressed && colliding)
     {
@@ -66,7 +66,7 @@ class Button
   }
   
   
-  void update(boolean isMousePressed, Vector v)
+  void update(boolean isMousePressed, Vector v, float x)
   {
     doneChecking = false;
     colliding = false;
@@ -91,11 +91,11 @@ class Button
       if (p.y < bbEdgeT) bbEdgeT = p.y;
     }
     
-    colliding = checkCollisionWithPoint(new PVector(mouseX - 1500, mouseY));
+    colliding = checkCollisionWithPoint(new PVector(mouseX - x, mouseY));
     
     if (isMousePressed && colliding)
     {
-      clickDrag();
+      
     }
     
     draw();
@@ -110,6 +110,16 @@ class Button
     }
   }
   
+  public Vector whenClicked()
+  {
+    return heldVector;
+  }
+  
+  public boolean isColliding()
+  {
+    return colliding;
+  }
+  
   void draw()
   {
     fill(255);
@@ -122,7 +132,10 @@ class Button
     stroke(0);
     rect(bbEdgeL, bbEdgeT, bbEdgeR - bbEdgeL, bbEdgeB - bbEdgeT);
     fill(0);
-    text(buttonText, bbEdgeL + 10, bbEdgeT + 15);
+    if (buttonText != null)
+    {
+      text(buttonText, bbEdgeL + 10, bbEdgeT + 15);
+    }
   }
   
   boolean checkCollisionWithPoint(PVector pt)
@@ -136,6 +149,21 @@ class Button
   void setText(String text)
   {
     buttonText = text;
+  }
+  
+  void setPosition(PVector v)
+  {
+    position = v;
+  }
+  
+  void setSelected(boolean t)
+  {
+    isSelected = t;
+  }
+  
+  boolean getSelected()
+  {
+    return isSelected;
   }
 }
 
