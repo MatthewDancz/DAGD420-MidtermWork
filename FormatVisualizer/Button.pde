@@ -10,7 +10,7 @@ class Button
   float bbEdgeL = 0, bbEdgeR = 0, bbEdgeT = 0, bbEdgeB = 0;
   float scale = 1;
   
-  boolean colliding = false, doneChecking = false, removeMe = false;
+  boolean colliding = false, doneChecking = false, isSelected = false;
   
   String buttonText = null;
   
@@ -61,6 +61,8 @@ class Button
     
     if (isMousePressed && colliding)
     {
+      isSelected = true;
+      fill(255);
       clickDrag();
     }
     
@@ -96,7 +98,8 @@ class Button
     
     if (isMousePressed && colliding)
     {
-      
+      isSelected = true;
+      fill(255);
     }
     
     draw();
@@ -131,7 +134,8 @@ class Button
     
     if (isMousePressed && colliding)
     {
-      
+      isSelected = true;
+      fill(255);
     }
     
     draw();
@@ -149,7 +153,7 @@ class Button
   public Vector whenClicked() { return heldVector; }
   public int getHeldIndex() { return heldIndex; }
   public int getMyIndex() { return myIndex; }
-  public boolean getRemoveMe() { return removeMe; }
+  public boolean getSelected() { return isSelected; }
   public boolean isColliding() { return colliding; }
   public void setMyIndex(int i) { myIndex = i; }
   
