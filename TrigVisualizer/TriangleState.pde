@@ -141,7 +141,7 @@ class TriangleState extends State {
 
     // text("Hypotenuse Angle      =  " + angleText, 10,75);
 
-    b.Draw();
+    //b.Draw();
     //rect(100,100,10,10);
 
     super.Draw();
