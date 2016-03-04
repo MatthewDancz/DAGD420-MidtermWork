@@ -26,31 +26,43 @@ class Matrix
   }
   
   void addVector(Vector worldVector) { Vectors.add(worldVector); }
-  void removeVector(int index) { Vectors.remove(index); }
   
-  void myTranslate(float x, float y, Vector v)
+  void myTranslate(float x, float y)
   {
     propertyArray[0][2] = x;
     propertyArray[1][2] = y;
     
-    display();
+    pushMatrix();
+    translate(x, y);
+
+    popMatrix();
   }
   
-  void myScale(float x, float y, Vector v)
+  void myScale(float x, float y)
   {
     propertyArray[0][0] = x;
     propertyArray[1][1] = y;
     
-    display();
+    pushMatrix();
+    scale(x, y);
+    
+    popMatrix();
   }
   
-  void myRotate(float angle, Vector v)
+  void myRotate(float angle)
   {
     propertyArray[0][0] = cos(angle);
     propertyArray[0][1] = sin(angle);
     propertyArray[1][0] = -propertyArray[0][1];
     propertyArray[1][1] = propertyArray[0][0];
-    
+
+  }
+  
+  public void applyMatrixAdjustments()
+  {
+    myTranslate(1, 1);
+    myScale(1, 1);
+    myRotate(1);
     display();
   }
   
@@ -72,18 +84,21 @@ class Matrix
         PVector normal1 = new PVector(-m * sin(v.getThetaAngle()), m * cos(v.getThetaAngle()));
         PVector normal2 = new PVector(m * sin(v.getThetaAngle()), -m * cos(v.getThetaAngle()));
         pushMatrix();
+        strokeWeight(3);
+        translate(-width/2, height/2);
+        line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
+        fill(0, 255, 0);
+        text(v.getVectorName(), v.getMagnitude()/half * cos(v.getThetaAngle()), v.getMagnitude()/half * sin(v.getThetaAngle()));
+        
         translate((v.getMagnitude() - 2 * m) * cos(v.getThetaAngle()), (v.getMagnitude() - 2 * m) * sin(v.getThetaAngle()));
+        fill(0);
         beginShape();
         vertex(straight.x, straight.y);
         vertex(normal1.x, normal1.y);
         vertex(normal2.x, normal2.y);
         endShape(CLOSE);
         popMatrix();
-        strokeWeight(3);
-        line(v.getOriginX(), v.getOriginY(), v.getComponentX(), v.getComponentY());
-        fill(0, 255, 0);
-        text(v.getVectorName(), v.getMagnitude()/half * cos(v.getThetaAngle()), v.getMagnitude()/half * sin(v.getThetaAngle()));
-        fill(0);
+
         v.setIsDrawn();
       }
     }

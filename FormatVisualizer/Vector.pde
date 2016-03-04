@@ -29,4 +29,6 @@ class Vector
   float getThetaAngle() { return thetaAngle; }
   String getVectorName() { return name; }
   void setIsDrawn() { isDrawn = !isDrawn; }
+  void setComponentX(float x) { componentX = x; }
+  void setComponentY(float y) { componentY = y; }
 }

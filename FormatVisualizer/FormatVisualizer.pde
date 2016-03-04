@@ -23,7 +23,7 @@ boolean isMouseClicked = false, isMouseClickedPreviously = false, onButton = fal
 boolean isAddVector = false, isAddVectorPreviously = false, isSubtractVector = false, isDrawVector = true, isDeleteVector = false, isSelectVector = false;
 boolean isHelpTextDrawn = false, isUpdateHelpText = true;
 
-ListView ListView1 = new ListView(new PVector(sizeX, 0));
+ListView ListView1 = new ListView(new PVector(propertyBoxWidth/half, 10), hierarchyBoxWidth);
 
 ArrayList<Button> Buttons = new ArrayList<Button>();
 ArrayList<Button> toolBoxButtons = new ArrayList<Button>();
@@ -33,35 +33,45 @@ Vector previousVector, firstVector, secondVector;
 
 int counts = 0;
 
+color b1 = #1B94B5;
+color g1 = #4D7782;
+color b2 = #105669;
+color b3 = #3A9AB5;
+color b4 = #082C36;
+color y1 = #FF9410;
+color b2o50 = color(16, 86, 105, 120);
+color b2o25 = color(16, 86, 105, 60);
+
 String direction = "Click to draw Vectors.";
 
 void setup()
 {
   size(1500, 1000);
-  background(100);
+  background(b4);
+  stroke(b2);
   line(midPointX, -10000, midPointX, 10000);
   line(-10000, midPointY, 10000, midPointY);
-  
-  drawVector = new Button(new PVector(0, 0), toolBoxWidth, 20, 0);
+
+  drawVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   drawVector.setText("Draw Vectors");
   toolBoxButtons.add(drawVector);
-  
-  addVector = new Button(new PVector(0, 0), toolBoxWidth, 20, 1);
+
+  addVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   addVector.setText("Add Vectors");
   toolBoxButtons.add(addVector);
-  
-  subtractVector = new Button(new PVector(0, 0), toolBoxWidth, 20, 2);
+
+  subtractVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   subtractVector.setText("Subtract Vectors");
   toolBoxButtons.add(subtractVector);
-  
-  deleteVector = new Button(new PVector(0, 0), toolBoxWidth, 20, 3);
+
+  deleteVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   deleteVector.setText("Delete Vector");
   toolBoxButtons.add(deleteVector);
-  
-  selectVector = new Button(new PVector(0, 0), toolBoxWidth, 20, 4);
+
+  selectVector = new Button(new PVector(0, 0), toolBoxWidth, 20);
   selectVector.setText("Select Vector");
   toolBoxButtons.add(selectVector);
-  
+
   updateWindow();
 }
 
@@ -70,12 +80,19 @@ void draw()
   //World Space
   pushMatrix();
   translate(midPointX, midPointY);
+  
+  if (isDeleteVector == true)
+  {
+    ListView1.RemoveCurrentButton();
+  }
+  
   if (isMouseClicked && !isMouseClickedPreviously)
   {
     holder = A.getSize() + 1;
-    A.addVector(new Vector("V" + holder, xStart, yStart, mouseXEnd, mouseYEnd));
+    ListView1.AddButton(new Vector("V" + holder, xStart, yStart, mouseXEnd, mouseYEnd));
     isTextChanged = true;
   }
+  
   if (isAddVector == true && isVectorAdded == false && firstVector != null && secondVector != null)
   {
     holder = A.getSize() + 1;
@@ -96,24 +113,19 @@ void draw()
     A.addVector(new Vector("V" + holder, xStart, yStart, firstVector.getComponentX() - secondVector.getComponentX(), firstVector.getComponentY() - secondVector.getComponentY()));
     isVectorAdded = true;
   }
-  
-  if (isDeleteVector == true)
-  {
-    ListView1.RemoveCurrentButton();
-  }
-  
+
   strokeWeight(0);
   stroke(0, 255, 0);
   line(lastLine[0], lastLine[1], lastLine[2], lastLine[3]);
   strokeWeight(3);
   stroke(0);
-  
-  A.display();
+
+  //A.display();
   isMouseClickedPreviously = isMouseClicked;
   popMatrix();
 
   //Screen Space
-  if(isTextChanged)
+  if (isTextChanged)
   {
     updateWindow();
   }
@@ -131,12 +143,12 @@ void updateWindow()
   for (Button b : toolBoxButtons)
   {
     b.setPosition(new PVector(toolBoxWidth/2 + (j * toolBoxWidth), origin.y + 10));
-    b.update(isMouseClicked, 0);
+    b.update(isMouseClicked);
     j++;
   }
   if (isHelpTextDrawn == false || isUpdateHelpText == true)
   {
-    fill(100);
+    fill(b4);
     noStroke();
     rect(origin.x, origin.y + 23, toolBoxWidth + 20, 20);
     fill(0);
@@ -145,25 +157,20 @@ void updateWindow()
     isHelpTextDrawn = true;
     isUpdateHelpText = false;
   }
-  
+
   translate(1500, 0);
   fill(255);
   /*Button heirarchyButton = new Button(new PVector(hierarchyBoxWidth/2, origin.y + 5), hierarchyBoxWidth, 20);
-  heirarchyButton.setText("View Heirarchy");
-  heirarchyButton.update(isMouseClicked);*/
+   heirarchyButton.setText("View Heirarchy");
+   heirarchyButton.update(isMouseClicked);*/
   fill(0);
   stroke(0);
-  int i = 1;
-  for(Vector v : A.Vectors)
+  if (isDeleteVector == false)
   {
-    Button b = new Button(new PVector(hierarchyBoxWidth/2, origin.y + 20 * i - 10), hierarchyBoxWidth, 20, i);
-    b.setText("Vector " + i);
-    b.update(isMouseClicked, v, 1500);
-    ListView1.AddButton(b);
+    //A.display();
     ListView1.Display(isMouseClicked);
-    i++;
   }
-  
+
   translate(0, 1000);
   fill(255);
   rect(origin.x, origin.y, propertyBoxWidth, -150);
@@ -195,7 +202,7 @@ void mousePressed()
       direction = "Click to draw Vectors.";
       isUpdateHelpText = true;
     }
-    
+
     if (addVector.isColliding() == true)
     {
       isDrawVector = false;
@@ -206,7 +213,7 @@ void mousePressed()
       direction = "Select vectors by left and right clicking.";
       isUpdateHelpText = true;
     }
-    
+
     if (subtractVector.isColliding() == true)
     {
       isDrawVector = false;
@@ -217,7 +224,7 @@ void mousePressed()
       direction = "Select vectors by left and right clicking.";
       isUpdateHelpText = true;
     }
-    
+
     if (deleteVector.isColliding() == true)
     {
       isDrawVector = false;
@@ -228,7 +235,7 @@ void mousePressed()
       direction = "Select a vector to delete.";
       isUpdateHelpText = true;
     }
-    
+
     if (selectVector.isColliding() == true)
     {
       isDrawVector = false;
@@ -240,9 +247,9 @@ void mousePressed()
       isUpdateHelpText = true;
     }
   }
-  
+
   ListView1.checkButtonCollision();
-  
+
   for (Button b : toolBoxButtons)
   {
     if (mouseButton == LEFT && b.isColliding())
@@ -250,7 +257,7 @@ void mousePressed()
       onButton = true;
     }
   }
-  
+
   if (mouseButton == LEFT && onButton == false && isDrawVector == true)
   {
     isMouseClicked = true;
@@ -265,12 +272,12 @@ void mouseReleased()
   {
     b.colliding = false;
   }
-  
+
   for (Button b : toolBoxButtons)
   {
     b.colliding = false;
   }
-  
+
   if (mouseButton == LEFT)
   {
     isMouseClicked = false;
