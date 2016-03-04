@@ -10,6 +10,8 @@ static class Keys {
   static boolean[] keys = new boolean[MAX_VALUE];
   static boolean[] pkeys = new boolean[MAX_VALUE];
   
+  static boolean mouseDown = false;
+  
   static boolean isDown(int code) {
     if (code < 0) return false;
     if (code >= keys.length) return false;
@@ -38,4 +40,10 @@ void keyPressed() {
 }
 void keyReleased() {
   Keys.handleKey(keyCode, false);
+}
+void mousePressed() {
+   Keys.mouseDown = true; 
+}
+void mouseReleased() {
+   Keys.mouseDown = false; 
 }

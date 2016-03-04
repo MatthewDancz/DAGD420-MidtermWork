@@ -22,8 +22,8 @@ class TriangleState extends State {
 
   PVector selectedPoint;
   float scale = 4;
-  
-  
+
+
   color b1 = #1B94B5;
   color g1 = #4D7782;
   color b2 = #105669;
@@ -33,25 +33,37 @@ class TriangleState extends State {
   color b4 = #082C36;
   color y1 = #FF9410;
 
+  Button b;
+
 
   TriangleState() {
     println("THI");
     name = "tri";
+
+
+    b = new Button(100, 100, 100, 100, "test");
   }
 
 
   void Update() {
+    b.Update();
+    //if (b.isTriggered) //do sometihng;
+    if (mouseX > 300) {
+      if (mouseWheelValue > 0) scale--;
+      if (mouseWheelValue < 0) scale++;
+      if (scale >=5) scale = 5;
+      if (scale <= 1) scale = 1;
 
 
-    if (mouseWheelValue > 0) scale--;
-    if (mouseWheelValue < 0) scale++;
-    if (scale >=5) scale = 5;
-    if (scale <= 1) scale = 1;
 
 
-
-    TmouseX = mouseX - width/2;
-    TmouseY = mouseY - height/2;
+      TmouseX = mouseX - width/2 - 150;
+      TmouseY = mouseY - height/2;
+    }
+    if (TmouseX > 300) TmouseX = 300; 
+    if (TmouseX < -300) TmouseX = -300; 
+    if (TmouseY > 350) TmouseY = 350; 
+    if (TmouseY < -350) TmouseY = -350; 
 
     selectedPoint = new PVector(TmouseX, TmouseY);
     selectedPoint.div(scale);
@@ -74,7 +86,7 @@ class TriangleState extends State {
   }
   void Draw() {
     pushMatrix();
-    translate(width/2, height/2);
+    translate(width/2 + 150, height/2);
     scale(scale);
 
     background(b4);
@@ -86,12 +98,12 @@ class TriangleState extends State {
     strokeWeight(1 / scale);
     for (int i = -width/2; i < width/2; i += 10) {
       stroke(b2o25);
-      if(i % 50 == 0) stroke(b2o50);
+      if (i % 50 == 0) stroke(b2o50);
       line(i, -height/2, i, height/2);
     }
     for (int i = -height/2; i < height/2; i += 10) {
       stroke(b2o25);
-      if(i % 50 == 0) stroke(b2o50);
+      if (i % 50 == 0) stroke(b2o50);
       line(-width/2, i, width/2, i);
     }
 
@@ -110,19 +122,27 @@ class TriangleState extends State {
     line(0, 0, selectedPoint.x, selectedPoint.y);
 
     textSize(16 / scale);
-
+    fill(255);
     text(oppLengthStr, oppTextPos.x, oppTextPos.y);
     text(hypLengthStr, hypTextPos.x, hypTextPos.y);
     text(adjLengthStr, adjTextPos.x, adjTextPos.y);
 
     popMatrix();
 
-    textSize(16);
+    noStroke();
+    fill(g1);
+    rect(0, 0, 300, height);
+    fill(255);
+
+    textSize(12);
     text("Hypotenuse Length     =  " + hypLengthStr, 10, 15);
     text("Adjacent Side Length  =  " + adjLengthStr, 10, 30);
     text("Opposite Side Length  =  " + oppLengthStr, 10, 45);
 
     // text("Hypotenuse Angle      =  " + angleText, 10,75);
+
+    b.Draw();
+    //rect(100,100,10,10);
 
     super.Draw();
   }
